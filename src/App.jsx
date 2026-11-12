@@ -3,6 +3,7 @@ import { HOTEL } from './data.js'
 import { buildTrip, todayIso } from './utils.js'
 import Overview from './Overview.jsx'
 import DayView from './DayView.jsx'
+import InstallBar from './InstallBar.jsx'
 
 export const DEFAULT_SETTINGS = { weekdayStart: '18:00', weekendStart: '09:00' }
 
@@ -111,6 +112,7 @@ export default function App() {
           ))}
         </nav>
       </header>
+      <InstallBar />
       <main className="wrap">
         {view < 0 ? <Overview {...shared} /> : <DayView key={view} day={trip[view]} {...shared} />}
       </main>

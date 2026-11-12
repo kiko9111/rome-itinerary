@@ -8,3 +8,8 @@ ReactDOM.createRoot(document.getElementById('root')).render(
     <App />
   </React.StrictMode>,
 )
+
+// Register the offline service worker on the published site (not in dev or inside a sandboxed preview).
+if ('serviceWorker' in navigator && import.meta.env.PROD && location.protocol === 'https:') {
+  window.addEventListener('load', () => { navigator.serviceWorker.register('./sw.js').catch(() => {}) })
+}
