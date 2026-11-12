@@ -9,7 +9,12 @@ export default function InstallBar() {
   })
   const [saving, setSaving] = useState('')
   const standalone = typeof window !== 'undefined' && (window.matchMedia?.('(display-mode: standalone)').matches || window.navigator.standalone)
-  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent)
+  const ua = navigator.userAgent
+  const ios = /iphone|ipad|ipod/i.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1)
+  const android = /android/i.test(ua)
+  // In-app browsers (Claude, WhatsApp, Instagram, Facebook, Gmail...) can't install apps.
+  const inApp = /Claude|FBAN|FBAV|Instagram|WhatsApp|Line\/|GSA\/|wv\)|; wv/i.test(ua) || (ios && !/Safari\//.test(ua))
+  const iosOtherBrowser = ios && /CriOS|FxiOS|EdgiOS/.test(ua)
 
   useEffect(() => {
     const on = (e) => { e.preventDefault(); setPrompt(e) }
@@ -34,7 +39,7 @@ export default function InstallBar() {
       </div>
     )
   }
-  if (hidden || (!prompt && !ios)) return null
+  if (hidden) return null
   return (
     <div className="install wrap">
       {prompt ? (
@@ -42,8 +47,14 @@ export default function InstallBar() {
           <span>📲 Install <b>Rome 19</b> on your phone: home-screen icon, full screen, works offline.</span>
           <button className="btn" onClick={async () => { prompt.prompt(); await prompt.userChoice; setPrompt(null) }}>Install app</button>
         </>
+      ) : inApp ? (
+        <span>📲 To install the app, open this page in {ios ? <b>Safari</b> : <b>Chrome</b>} first: tap the ⋯ or share menu and choose <b>Open in browser</b>. Then add it to your home screen.</span>
+      ) : ios ? (
+        <span>📲 Install on iPhone: in {iosOtherBrowser ? 'this browser' : 'Safari'} tap <b>Share</b> <span aria-hidden="true">⬆︎</span>, then <b>Add to Home Screen</b>.</span>
+      ) : android ? (
+        <span>📲 Install on Android: tap the Chrome menu <b>⋮</b> (top right), then <b>Add to Home screen</b> or <b>Install app</b>.</span>
       ) : (
-        <span>📲 To install on iPhone: tap <b>Share</b> <span aria-hidden="true">⬆︎</span> in Safari, then <b>Add to Home Screen</b>.</span>
+        <span>📲 Install it: open your browser menu and choose <b>Install</b> or <b>Add to Home screen</b>.</span>
       )}
       <button className="link-btn" onClick={hide}>Hide</button>
     </div>
